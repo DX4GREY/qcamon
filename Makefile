@@ -26,6 +26,7 @@ build-termux:
 	@echo "Architecture: $(ARCH)" >> $(O)/termux/DEBIAN/control
 	@echo "Maintainer: Dx4Grey <dxablack@gmail.com>" >> $(O)/termux/DEBIAN/control
 	@echo "Description: WiFi manager for Qualcomm qcacld (Termux)" >> $(O)/termux/DEBIAN/control
+	@echo "Depends: iw, iproute2" >> $(O)/termux/DEBIAN/control
 	@dpkg-deb --build $(O)/termux 2>/dev/null
 	@if [ $$? -eq 0 ]; then \
 		echo -e "\033[1;32m[OK]\033[0m Termux build complete."; \
@@ -47,6 +48,7 @@ build-debian:
 	@echo "Architecture: $(ARCH)" >> $(O)/debian/DEBIAN/control
 	@echo "Maintainer: Dx4Grey <dxablack@gmail.com>" >> $(O)/debian/DEBIAN/control
 	@echo "Description: WiFi manager for Qualcomm qcacld (Debian)" >> $(O)/debian/DEBIAN/control
+	@echo "Depends: iw, iproute2" >> $(O)/debian/DEBIAN/control
 	@dpkg-deb --build $(O)/debian 2>/dev/null
 	@if [ $$? -eq 0 ]; then \
 		echo -e "\033[1;32m[OK]\033[0m Debian build complete."; \
