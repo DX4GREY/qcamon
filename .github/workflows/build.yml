@@ -34,10 +34,20 @@ jobs:
         run: |
           ls -l out
 
-      - name: Upload artifact
+      - name: Upload termux-package
         uses: actions/upload-artifact@v7
         with:
+          name: termux-package
           path: |
-            out/*.deb
+            out/termux.deb
+          if-no-files-found: error
+          archive: false
+          
+      - name: Upload debian-package
+        uses: actions/upload-artifact@v7
+        with:
+          name: debian-package
+          path: |
+            out/debian.deb
           if-no-files-found: error
           archive: false
