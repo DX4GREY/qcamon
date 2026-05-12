@@ -26,13 +26,9 @@ jobs:
         run: |
           make build-termux
 
-      - name: Build for Debian
+      - name: Build for Debian Based Systems
         run: |
           make build-debian
-
-      - name: Build for RPM
-        run: |
-          make build-rpm
 
       - name: Verify Artifacts
         run: |
