@@ -35,8 +35,9 @@ jobs:
           ls -l out
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           path: |
             out/*.deb
           if-no-files-found: error
+          archive: false
