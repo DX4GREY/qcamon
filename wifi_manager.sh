@@ -16,7 +16,7 @@ NC='\033[0m'
 
 check_root() {
     if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}[ERROR]${NC} Harus root."
+        echo -e "${RED}[ERROR]${NC} Need to run as root. Use 'su' or 'sudo'."
         exit 1
     fi
 }
@@ -24,7 +24,7 @@ check_root() {
 check_deps() {
     for cmd in iw ip svc; do
         if ! command -v $cmd &>/dev/null; then
-            echo -e "${RED}[ERROR]${NC} '$cmd' tidak ada."
+            echo -e "${RED}[ERROR]${NC} '$cmd' is required but not found. Please install it."
             exit 1
         fi
     done
@@ -48,7 +48,7 @@ restart_driver() {
             return 1
         fi
     else
-        echo -e " ${RED}modul tidak ditemukan${NC}"
+        echo -e " ${RED}module not found${NC}"
         return 1
     fi
 }
@@ -58,22 +58,22 @@ restart_driver() {
 set_mode() {
     local mode="$1"
     if [[ ! "$mode" =~ ^(managed|monitor)$ ]]; then
-        echo -e "${RED}[ERROR]${NC} Mode harus 'managed' atau 'monitor'."
+        echo -e "${RED}[ERROR]${NC} Must specify mode: 'managed' or 'monitor'."
         return 1
     fi
 
     if [[ ! -f "$CON_MODE_PATH" ]]; then
-        echo -e "${RED}[ERROR]${NC} con_mode tidak ditemukan. Driver mungkin bukan qcacld."
+        echo -e "${RED}[ERROR]${NC} con_mode not found. Driver might not be qcacld."
         return 1
     fi
 
     local current=$(cat "$CON_MODE_PATH" 2>/dev/null | tr -d ' \n')
     if [[ "$mode" == "monitor" ]]; then
         if [[ "$current" == "4" ]]; then
-            echo -e "${YELLOW}[INFO]${NC} Sudah dalam monitor mode."
+            echo -e "${YELLOW}[INFO]${NC} Already in monitor mode."
             return 0
         fi
-        echo -ne "${YELLOW}[INFO]${NC} Beralih ke monitor mode..."
+        echo -ne "${YELLOW}[INFO]${NC} Switching to monitor mode..."
         svc wifi disable 2>/dev/null
         ip link set "$INTERFACE" down 2>/dev/null
         echo "4" > "$CON_MODE_PATH" 2>/dev/null
@@ -83,10 +83,10 @@ set_mode() {
     else
         # managed: butuh restart driver setelah set con_mode 0
         if [[ "$current" == "0" ]]; then
-            echo -e "${YELLOW}[INFO]${NC} Sudah managed mode."
+            echo -e "${YELLOW}[INFO]${NC} Already in managed mode."
             return 0
         fi
-        echo -ne "${YELLOW}[INFO]${NC} Beralih ke managed mode (restart driver)..."
+        echo -ne "${YELLOW}[INFO]${NC} Switching to managed mode (restart driver)..."
         # echo "0" > "$CON_MODE_PATH" 2>/dev/null
         sleep 1
         # Restart driver biar bersih
@@ -96,7 +96,7 @@ set_mode() {
             svc wifi enable 2>/dev/null
             echo -e " ${GREEN}done${NC}"
         else
-            echo -e " ${RED}failed reload modul${NC}"
+            echo -e " ${RED}failed reload module${NC}"
             return 1
         fi
     fi
@@ -107,20 +107,20 @@ set_mode() {
 set_channel() {
     local chan="$1"
     if [[ -z "$chan" ]]; then
-        echo -e "${RED}[ERROR]${NC} Tentukan channel."
+        echo -e "${RED}[ERROR]${NC} Specify channel."
         return 1
     fi
     local mode=$(iw dev "$INTERFACE" info 2>/dev/null | grep type | awk '{print $2}')
     if [[ "$mode" != "monitor" ]]; then
-        echo -e "${RED}[ERROR]${NC} $INTERFACE bukan monitor mode. Jalankan 'mode monitor' dulu."
+        echo -e "${RED}[ERROR]${NC} $INTERFACE is not in monitor mode. Run 'mode monitor' first."
         return 1
     fi
-    echo -e "${YELLOW}[INFO]${NC} Set channel $chan pada $INTERFACE..."
+    echo -e "${YELLOW}[INFO]${NC} Setting channel $chan on $INTERFACE..."
     iw dev "$INTERFACE" set channel "$chan"
     if [[ $? -eq 0 ]]; then
         echo -e "${GREEN}[OK]${NC} Channel $chan."
     else
-        echo -e "${RED}[ERROR]${NC} Gagal set channel."
+        echo -e "${RED}[ERROR]${NC} Failed to set channel."
         return 1
     fi
 }
@@ -147,15 +147,15 @@ usage() {
     cat << EOF
 Usage: $0 {restart|mode|channel|status} [args]
 
-  restart                     Restart driver (reload modul wlan.ko)
+  restart                     Restart driver (reload module wlan.ko)
   mode {managed|monitor}      Set mode via con_mode
-  channel <chan>              Set channel (wajib monitor mode dulu)
-  status                      Tampilkan status
+  channel <chan>              Set channel (just for monitor mode)
+  status                      Show status
 
 Example:
   $0 mode monitor
   $0 channel 6
-  $0 mode managed   -> akan restart driver otomatis
+  $0 mode managed   -> Automatically restart driver
   $0 restart
   $0 status
 EOF
