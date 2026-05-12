@@ -33,3 +33,10 @@ jobs:
       - name: Verify Artifacts
         run: |
           ls -l out
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: |
+            out/*.deb
+          if-no-files-found: error
