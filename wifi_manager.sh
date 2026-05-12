@@ -145,7 +145,7 @@ show_status() {
 
 usage() {
     cat << EOF
-Usage: $0 {restart|mode|channel|status} [args]
+Usage: ${basename $0} {restart|mode|channel|status} [args]
 
   restart                     Restart driver (reload module wlan.ko)
   mode {managed|monitor}      Set mode via con_mode
@@ -153,11 +153,11 @@ Usage: $0 {restart|mode|channel|status} [args]
   status                      Show status
 
 Example:
-  $0 mode monitor
-  $0 channel 6
-  $0 mode managed   -> Automatically restart driver
-  $0 restart
-  $0 status
+  ${basename $0} mode monitor
+  ${basename $0} channel 6
+  ${basename $0} mode managed   -> Automatically restart driver
+  ${basename $0} restart
+  ${basename $0} status
 EOF
     exit 1
 }
