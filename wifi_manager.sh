@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ======================================================
-# wifi_manager.sh untuk Qualcomm qcacld (tanpa vinf)
-# Mode monitor via con_mode sysfs, restart driver untuk reset
+# wifi_manager.sh for qualcomm qcacld driver on Android
+# Mode monitor via con_mode sysfs, restart driver via rmmod/insmod
 # ======================================================
 
 MODULE_PATH="/data/local/tmp/wlan.ko"
@@ -53,8 +53,8 @@ restart_driver() {
     fi
 }
 
-# Set mode: managed (0) atau monitor (4) via con_mode
-# Untuk monitor langsung pakai con_mode=4, untuk managed set 0 lalu restart driver (karena qcacld butuh reload)
+# Set mode: managed (0) or monitor (4) via con_mode
+# Restart driver after set con_mode 0
 set_mode() {
     local mode="$1"
     if [[ ! "$mode" =~ ^(managed|monitor)$ ]]; then
